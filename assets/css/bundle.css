@@ -2762,7 +2762,7 @@ a.list-group-item-danger.active,a.list-group-item-danger.active:focus,a.list-gro
   overflow: hidden;
 }
 
-.embed-responsive .embed-responsive-item,.embed-responsive embed,.embed-responsive object,.embed-responsive video {
+.embed-responsive .embed-responsive-item,.embed-responsive embed,.embed-responsive iframe,.embed-responsive object,.embed-responsive video {
   position: absolute;
   top: 0;
   bottom: 0;
