@@ -9990,15 +9990,9 @@ var GlobalConfig = {
 	BasePagePath: ""
 };
 
-/*
- * segment installation
- */
+
 /* jshint ignore:start */
-var segmentKey = "AfolZ4cTJuozZ7K0dPvMmquy98mvDhC2";
-!function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t){var e=document.createElement("script");e.type="text/javascript";e.async=!0;e.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};analytics.SNIPPET_VERSION="3.1.0";
-analytics.load(segmentKey);
-analytics.page()
-}}();
+
 /* jshint ignore:end */
 
 var phoneNumberOptions = {
@@ -10018,9 +10012,8 @@ var VALID_CARD_NUMBER = "4444111144441111";
 
 var md = new MobileDetect(window.navigator.userAgent);
 function customWrapperForIsMobileDevice() {
-	"use strict";    
-    // console.log(md);
-    // console.log(md.userAgent());
+	"use strict";
+    
 
     if(md.mobile() || md.phone() || md.tablet()){
         return true;
@@ -10108,12 +10101,7 @@ function loadStateFromZip() {
         }
 
         callAPI("state/" + fZipVal, params, "GET", function (resp) {
-            //var json = {};
-            // if (isValidJson(e)) {
-            //     json = JSON.parse(e);
-            // } else {
-            //     return "";
-            // }
+
 
             var jData = resp.data;
 
@@ -10229,10 +10217,6 @@ function getQueryVariable(variable) {
             console.log("url check-------->" , pair);
             return pair[1];
         }
-
-        // if (decodeURIComponent(pair[0]) === variable) {
-        //     return decodeURIComponent(pair[1]);
-        // }
     }
 
     return "";
@@ -10258,17 +10242,7 @@ function afGet(field, qsField) {
     return returnThis;
 }
 
-// function getParamObject() {
-//     "use strict";
 
-//     var obj = {};
-//     var urlParam = window.location.search.substring(1);
-//     urlParam.replace(/([^=&]+)=([^&]*)/g, function(m, key, value) {
-//         obj[decodeURIComponent(key)] = decodeURIComponent(value);
-//     });
-
-//     return obj;
-// }
 
 function getOrderData() {
 	"use strict";
@@ -10414,7 +10388,6 @@ function clearStorageItem(k) {
 		doUpsellYes(upsellID, $(this).data("productid"));
 	});
 }());
-
 
 /* jshint browser: true */
 /* jshint node: false */
@@ -11254,7 +11227,7 @@ function err_field_fv(e, data) {
             autoFocus: true,
             fields: {
                 // Name field
-                name: {
+                contactModalName: {
                     validMessage: "Nice to meet you!",
                     validators: {
                         notEmpty: {
@@ -11409,12 +11382,12 @@ function err_field_fv(e, data) {
 		*/
     if ($("#modal-contact").length > 0) {
         $("#modal-contact").on("shown.bs.modal", function(event) {
-            window.scrollTo(0, 1);
+            // window.scrollTo(0, 1);
 
-            // For showing keyboard on mobile device
-            setTimeout(function(){
-                $("#name").focus();
-            }, 1000);
+            // // For showing keyboard on mobile device
+            // setTimeout(function(){
+            //     $("#name").focus();
+            // }, 1000);
         });
     }
 
