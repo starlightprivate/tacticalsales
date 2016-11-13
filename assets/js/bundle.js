@@ -11158,7 +11158,7 @@ function err_field_fv(e, data) {
     function submitContactForm() {
 	    var data = {};
 	    data.Email = $("[name=email]").val();
-	    data.FirstName = $("[name=name]").val();
+	    data.FirstName = $("[name=contactModalName]").val();
 	    data.MobilePhone = $("[name=phoneNumber]").val();
         data.LastName = "NA";
 
