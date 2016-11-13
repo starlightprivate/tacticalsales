@@ -1,8 +1,8 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
-<svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20120731 at Fri Nov 11 17:57:21 2016
+Created by FontForge 20160405 at Sun Nov 13 15:17:02 2016
  By www-data
 Copyright (c) The Font Bureau, Inc., 2008. All rights reserved.
 </metadata>
@@ -20,7 +20,7 @@ Copyright (c) The Font Bureau, Inc., 2008. All rights reserved.
     cap-height="750"
     bbox="-68 -269 1271 1017"
     underline-thickness="50"
-    underline-position="-50"
+    underline-position="-100"
     unicode-range="U+0020-FB04"
   />
 <missing-glyph horiz-adv-x="500" 
@@ -1839,6 +1839,33 @@ c63 -18 80 -57 80 -130c0 -104 -62 -157 -190 -157z" />
     <hkern g1="seven.dnom" g2="two.dnom" k="3" />
     <hkern g1="seven.dnom" g2="one.dnom" k="-17" />
     <hkern u1="&#x2265;" u2="&#x37;" k="20" />
+    <hkern g1="B"
+	g2="A,Agrave,Aacute,Acircumflex,Atilde,Adieresis,Aring,Amacron,Abreve,Aogonek"
+	k="5" />
+    <hkern g1="B"
+	g2="J,Jcircumflex"
+	k="10" />
+    <hkern g1="B"
+	g2="S,Sacute,Scircumflex,Scedilla,Scaron,Scommaaccent"
+	k="4" />
+    <hkern g1="B"
+	g2="T,Tcommaaccent,Tcaron"
+	k="9" />
+    <hkern g1="B"
+	g2="Y,Ygrave,Yacute,Ycircumflex,Ydieresis"
+	k="14" />
+    <hkern g1="B"
+	g2="s,sacute,scircumflex,scedilla,scaron,scommaaccent"
+	k="5" />
+    <hkern g1="B"
+	g2="w,wgrave,wacute,wcircumflex,wdieresis"
+	k="5" />
+    <hkern g1="B"
+	g2="y,ygrave,yacute,ycircumflex,ydieresis"
+	k="5" />
+    <hkern g1="B"
+	g2="y.salt_tail,yacute.salt_tail,ydieresis.salt_tail,ycircumflex.salt_tail,ygrave.salt_tail"
+	k="5" />
     <hkern g1="Eng"
 	g2="T,Tcommaaccent,Tcaron"
 	k="7" />
