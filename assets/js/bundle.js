@@ -9976,3 +9976,1554 @@ if (typeof jQuery === 'undefined') {
 	};
 
 })(jQuery, window, document);
+/*
+ * Config.js AppCodeStarted
+ * remove duplicate slashes from url
+ */
+var SanitizedLocName = window.location.pathname.replace(/\/+/g, "/");
+
+/*
+ * used for api calls
+ */
+var GlobalConfig = {
+	ApiBaseUrl: "https://api.tacticalmastery.com/api/v1.0/",
+	BasePagePath: ""
+};
+
+
+/* jshint ignore:start */
+
+/* jshint ignore:end */
+
+var phoneNumberOptions = {
+	"translation": {
+		0: {pattern: /[0-9*]/}
+	}
+};
+
+// List of test credit card numbers that you want it to be passed although they can be invalid one
+var TEST_CARD_NUMBERS = ["0000000000000000"];
+
+// We will transform those test card numbers into a valid one as below
+var VALID_CARD_NUMBER = "4444111144441111";
+
+// check whether the browser is mobile device or not
+/* jshint maxlen: 205 */
+
+var md = new MobileDetect(window.navigator.userAgent);
+function customWrapperForIsMobileDevice() {
+	"use strict";
+    
+
+    if(md.mobile() || md.phone() || md.tablet()){
+        return true;
+    }
+    return false;
+}
+
+function getJson(e) {
+	"use strict";
+
+	var json = {};
+	if (isJsonObj(e)) {
+		json = e;
+	} else if (isValidJson(e)) {
+		json = JSON.parse(e);
+	}
+	return json;
+}
+
+function isJsonObj(obj) {
+	"use strict";
+
+	return (typeof obj === "object");
+}
+
+// check if a string is a valid json data
+function isValidJson(str) {
+    "use strict";
+
+    if (str === "") {
+        return false;
+    }
+
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+
+    return true;
+}
+
+// call API
+function callAPI(endpoint, data, method, callback) {
+	"use strict";
+
+	/* global GlobalConfig:true */
+    var ApiUrl = GlobalConfig.ApiBaseUrl + endpoint + "/";
+    method = method || "POST";
+
+    // if data is an array pass as post, otherwise the string is a simple get and needs to append to the end of the uri
+    if (data && data.constructor !== Object) {
+        ApiUrl += data;
+        data = null;
+    }
+
+    jQuery.ajax({
+        method: method,
+        url: ApiUrl,
+        data: data
+    }).done(function(msg) {
+        if (typeof callback === "function") {
+            callback(msg);
+        }
+    }).fail(function() {
+        console.log( "error occured on api - " + endpoint );
+    });
+}
+
+// load state from zipcode
+function loadStateFromZip() {
+    "use strict";
+
+    var fZip = $("#zipcode");
+    var fZipVal = fZip.val();
+    var params = [];
+
+    if (fZipVal.length === 5) {
+        fZip.addClass("processed");
+
+        $("#state, #city").prop("disabled", true);
+        $("#state + small + i, #city + small + i").show();
+        if (!$("#state + small + i").hasClass("fa-spin")) {
+            $("#state + small + i, #city + small + i").addClass("fa fa-spin fa-refresh");
+        }
+
+        callAPI("state/" + fZipVal, params, "GET", function (resp) {
+
+
+            var jData = resp.data;
+
+            if (resp.success) {
+                /* jshint ignore:start */
+                if (jData.primary_city !== undefined && jData.primary_city !== "" && jData.primary_city !== null) {
+                    $("#city").val(jData.primary_city);
+                }
+                /* jshint ignore:end */
+
+                if (jData.state !== undefined && jData.state !== "" && jData.state !== null) {
+                    $("#state").val(jData.state).trigger("change");
+                }
+
+                $("input[name=address1]").focus();
+            }
+
+            //remove fa spin icons and do formvalidation
+            $("#state + small + i, #city + small + i")
+                .hide()
+                .removeClass("fa").removeClass("fa-spin").removeClass("fa-refresh");
+            $("#state, #city").prop("disabled", false);
+
+            var frm;
+            if ($("#form-address").length > 0) {
+                frm = $("#form-address");
+            } else {
+                frm = $("#checkoutForm");
+            }
+
+            frm.formValidation("revalidateField", "city");
+            frm.formValidation("revalidateField", "state");
+        });
+    }
+}
+
+// Detects safari with Applewebkit only
+function isMobileSafari() {
+    "use strict";
+
+    return navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/);
+}
+
+function bootstrapModal(content, title) {
+    "use strict";
+
+    var modal = $("#tm-modal");
+
+    // set content
+    modal.find(".modal-body").html(content);
+
+    if (title !== null) {
+        modal.find(".modal-title").text(title);
+    }
+    else {
+        modal.find(".modal-title").text("");
+    }
+
+    // open modal
+    modal.modal("show");
+}
+
+function popPage(pageURL, title) {
+    "use strict";
+
+    jQuery.ajax({
+        method: "GET",
+        url: pageURL
+    }).done(function(msg) {
+        bootstrapModal(msg, title);
+    });
+}
+
+//Terms and privacy popups
+function termsModal(e) {
+    "use strict";
+
+    popPage("terms.html", "Terms & Conditions");
+}
+function partnerModal(e) {
+    "use strict";
+
+    popPage("partner.html", "Partner");
+}
+
+function privacyModal(e) {
+    "use strict";
+
+    popPage("privacy.html", "Privacy Policy");
+}
+
+function pressModal(e) {
+    "use strict";
+
+    popPage("press.html");
+}
+
+function custcareModal(e) {
+    "use strict";
+
+    popPage("customercare.html", "Customer Care");
+}
+
+function getQueryVariable(variable) {
+    "use strict";
+
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split("=");
+
+        if(pair[0] === variable){
+            console.log("url check-------->" , pair);
+            return pair[1];
+        }
+    }
+
+    return "";
+}
+
+function afGet(field, qsField) {
+    "use strict";
+
+    qsField = qsField || false;
+
+    var returnThis;
+    if (qsField) {
+        var qParam = getQueryVariable(qsField);
+        if (qParam !== "") {
+            returnThis = qParam;
+        }
+    }
+
+    if (returnThis) {
+        return returnThis.replace(/[+]/g, " ");
+    }
+
+    return returnThis;
+}
+
+
+
+function getOrderData() {
+	"use strict";
+
+	var keys = [
+		'orderId', 'firstName', 'lastName', 'emailAddress', 'phoneNumber',
+		'address1', 'city', 'state', 'postalCode', 'cardNumber', 'cardSecurityCode',
+		'cardMonth', 'cardYear', 'productId'
+	];
+
+	var obj = {};
+	for (var k in keys) {
+		if (keys.hasOwnProperty(k)) {
+			obj[keys[k]] = getStorageItem(keys[k]) || "";
+		}
+	}
+
+	return obj;
+}
+
+function getStorageItem(k) {
+	"use strict";
+	return localStorage.getItem(k);
+}
+
+function clearStorageItem(k) {
+	"use strict";
+	localStorage.removeItem(k);
+}
+
+/* jshint browser: true, node: false */
+/* global getJson:true, afGet:true, GlobalConfig:true, SanitizedLocName:true */
+
+(function() {
+	"use strict";
+
+	var upsellID = null;
+	if (SanitizedLocName.indexOf("us_batteryoffer") >= 0) {
+		upsellID = "battery";
+		window.myProductId = afGet("pId", "pId");
+	} else if (SanitizedLocName.indexOf("us_headlampoffer") >= 0) {
+		upsellID = "headlamp";
+	}
+
+	if (upsellID === null) {
+		// Not an upsell page
+		return;
+	}
+
+	/* global getOrderData: true */
+	var MediaStorage = getOrderData();
+	if (typeof MediaStorage.orderId === "undefined") {
+		// window.location = GlobalConfig.BasePagePath + "index.html";
+		window.location = "index.html";
+	}
+
+	/* global callAPI:true */
+	/* global bootstrapModal:true, isValidJson:true */
+	// Upsell functions
+	function doUpsellYes(upsellID, productId) {
+	    $("div#js-div-loading-bar").show();
+
+	    var usParams = {};
+	    if (MediaStorage.orderId) {
+	        usParams.orderId = MediaStorage.orderId;
+	        usParams.productQty = 1;
+
+	        switch (upsellID) {
+	            case "headlamp":
+	                productId = productId || "31";
+	                break;
+	            case "battery":
+	            	productId = productId || "11";
+	                break;
+	            default:
+	                break;
+	        }
+
+	        if (productId) {
+	            usParams.productId = productId;
+
+	            // var nextPage = GlobalConfig.BasePagePath + "receipt.html?orderId=" + MediaStorage.orderId;
+				var nextPage = "receipt.html?orderId=" + MediaStorage.orderId;
+	            if (upsellID === "battery") {
+	            	// nextPage = GlobalConfig.BasePagePath + "us_headlampoffer.html?orderId=" + MediaStorage.orderId;
+					nextPage = "us_headlampoffer.html?orderId=" + MediaStorage.orderId;
+	            }
+
+	            callAPI("upsell", usParams, "POST", function (e) {
+							var json = getJson(e);
+
+	                if (json.success) {
+						window.location = nextPage;
+	                } else {
+	                    if (json.message) {
+	                        var messageOut = "";
+	                        if (typeof(json.message) === "string") {
+	                            messageOut = json.message;
+	                            if (messageOut === "This upsale was already taken.") {
+	                                // continue down the funnel if the upsell is done
+	                                window.location = nextPage;
+	                                return;
+	                            }
+	                        } else {
+	                            for (var k in json.message) {
+	                                if (json.message.hasOwnProperty(k)) {
+	                                    messageOut += k + ":" + json.message[k] + "<br>";
+	                                }
+	                            }
+	                        }
+
+	                        bootstrapModal(messageOut, "Problem with your Addon");
+	                    }
+	                }
+
+	                $("div#js-div-loading-bar").hide();
+	            });
+	        }
+	    } else {
+	        bootstrapModal("There was an error finding your order, please refresh the page and try again.", "Error");
+	        $("div#js-div-loading-bar").hide();
+	    }
+	}
+
+	function doUpsellNo(upsellID) {
+	    $("div#js-div-loading-bar").show();
+
+	    // var nextPage = GlobalConfig.BasePagePath + "receipt.html?orderId=" + MediaStorage.orderId;
+		var nextPage = "receipt.html?orderId=" + MediaStorage.orderId;
+	    if (upsellID === "battery") {
+	    	// nextPage = GlobalConfig.BasePagePath + "us_headlampoffer.html?orderId=" + MediaStorage.orderId;
+			nextPage = "us_headlampoffer.html?orderId=" + MediaStorage.orderId;
+	    }
+
+	    window.location = nextPage;
+	}
+
+    $("#upsellNo").click(function (e) {
+		doUpsellNo(upsellID);
+    });
+
+	$(".doupsellyes").click(function(e) {
+		doUpsellYes(upsellID, $(this).data("productid"));
+	});
+}());
+
+/* jshint browser: true */
+/* jshint node: false */
+/* jshint maxlen: 1000 */
+/* global getJson:true, GlobalConfig:true, customWrapperForIsMobileDevice:true */
+
+(function() {
+    "use strict";
+
+    if (customWrapperForIsMobileDevice()) {
+        $("#checkout-wrapper").addClass("mobile-mode");
+        $("#step-4 .step-title span").html("Step #2 :");
+    }
+
+    $("input[name=phoneNumber]").mask("000-000-0000", phoneNumberOptions);
+
+    /* global getOrderData: true */
+    var MediaStorage = getOrderData();
+
+    function submitOrderForm(orderForm) {
+        /* global callAPI:true, isValidJson:true */
+        $("div#js-div-loading-bar").show();
+
+        var year = $("select[name=year]").val(),
+            month = $("select[name=month]").val();
+        var d = new Date();
+        var currentYear = d.getFullYear().toString().substr(2, 2),
+            currentMonth = ("0" + (d.getMonth() + 1)).slice(-2);
+
+        if (!((currentYear < year) || (currentYear === year) && (currentMonth <= month))) {
+            $("div#js-div-loading-bar").hide();
+            bootstrapModal("Invalid Expiration Date", "Problem with your order");
+            return;
+        }
+
+        var apiFields = [
+            "firstName",
+            "lastName",
+            "emailAddress",
+            "phoneNumber",
+            "address1",
+            "city",
+            "state",
+            "postalCode",
+            "cardNumber",
+            "cardSecurityCode",
+            "cardMonth",
+            "cardYear",
+            "campaignId",
+            "productId"
+        ];
+        var orderDetails = {};
+
+        $.each(apiFields, function(index, key) {
+            var uVal;
+            if (key !== "productId") {
+                uVal = $("[name=" + key + "]").val();
+            } else {
+                uVal = $("input[name='productId']:checked", "#checkoutForm").val();
+            }
+
+            orderDetails[key] = uVal;
+        });
+
+        orderDetails.cardMonth = $("[name=month]").val();
+        orderDetails.cardYear = $("[name=year]").val();
+        orderDetails.lastName = "NA";
+        orderDetails.orderId = MediaStorage.orderId;
+
+        var contactInfo = {};
+        contactInfo.firstName = orderDetails.firstName;
+        contactInfo.lastName = orderDetails.lastName;
+        contactInfo.emailAddress = orderDetails.emailAddress;
+        contactInfo.phoneNumber = orderDetails.phoneNumber;
+        contactInfo.address1 = orderDetails.address1;
+        contactInfo.city = orderDetails.city;
+        contactInfo.state = orderDetails.state;
+        contactInfo.postalCode = orderDetails.postalCode;
+
+        callAPI("update-contact", contactInfo, "POST", function(resp) {
+            console.log(resp);
+        });
+
+        callAPI("create-order", orderDetails, "POST", function(resp) {
+            //var json = getJson(e);
+
+            if (resp.success) {
+                $("#checkoutForm .btn-complete").removeClass("pulse");
+
+                if (resp.orderId) {
+                    localStorage.setItem('orderId', resp.orderId);
+                }
+
+                // window.location = GlobalConfig.BasePagePath + "us_batteryoffer.html?orderId=" + MediaStorage.orderId + "&pId=" + orderDetails.productId;
+                window.location = "us_batteryoffer.html?orderId=" + MediaStorage.orderId + "&pId=" + orderDetails.productId;
+            } else {
+                $("#checkoutForm .btn-complete").removeClass("pulse");
+                if (resp.message) {
+                    var errHead = "Problem with your order";
+                    var errBody;
+                    if (resp.message !== "Invalid Credit Card Number") {
+                        errHead = "Payment validation failed:  Processor Declined.";
+                        resp.message += "<br><br>For security reasons, you must re-enter a new card number.<br><br>" + "Tip: you may try another card or call <a href='tel:+18558807233'>(855) 880-7233</a>.";
+                    }
+                    errBody = "<span style='font-size:20px'>" + resp.message + "</span>";
+                    bootstrapModal(errBody, errHead);
+                }
+            }
+
+            $("div#js-div-loading-bar").hide();
+        });
+
+        return false;
+    }
+
+    /* global TEST_CARD_NUMBERS:true */
+    /* global VALID_CARD_NUMBER:true */
+    /* global phoneNumberOptions:true */
+    /* global bootstrapModal:true */
+    // Checkout Form Validator
+    var CheckoutFieldsReq;
+    if (!customWrapperForIsMobileDevice()) {
+        CheckoutFieldsReq = [
+            "firstName",
+            "lastName",
+            "emailAddress",
+            "phoneNumber",
+            "address1",
+            "city",
+            "state",
+            "postalCode",
+            "cardNumber",
+            "month",
+            "year"
+        ];
+    } else {
+        CheckoutFieldsReq = ["cardNumber", "month", "year"];
+    }
+
+    function checkoutButtonPulse(CheckoutFieldsReq, invalidFieldsCount) {
+        var cfCount = CheckoutFieldsReq.length,
+            icfCount = 1;
+
+        if (customWrapperForIsMobileDevice()) {
+            icfCount = 0;
+        }
+
+        for (var i = 0; i < CheckoutFieldsReq.length; i++) {
+            if ($("[name='" + CheckoutFieldsReq[i] + "'].required").parents(".form-group").hasClass("has-success")) {
+                icfCount++;
+            }
+        }
+
+        if (invalidFieldsCount === 0) {
+            if ($("#checkoutForm .fv-has-feedback.has-warning").length > 0) {
+                $("#checkoutForm .btn-complete").removeClass("pulse");
+            } else {
+                if (cfCount === icfCount) {
+                    $("#checkoutForm .btn-complete").addClass("pulse");
+                } else {
+                    $("#checkoutForm .btn-complete").removeClass("pulse");
+                }
+            }
+        } else {
+            $("#checkoutForm .btn-complete").removeClass("pulse");
+        }
+    }
+
+    if ($("#checkoutForm").length > 0) {
+        $("#checkoutForm").on("init.field.fv", function(e, data) {
+            var field = data.field, // Get the field name
+                $field = data.element, // Get the field element
+                bv = data.fv; // FormValidation instance
+
+            // Create a span element to show valid message
+            // and place it right before the field
+            var $span = $("<small/>").addClass("help-block validMessage text-success").attr("data-field", field).insertAfter($field).hide();
+
+            // Retrieve the valid message via getOptions()
+            var message = bv.getOptions(field).validMessage;
+            if (message) {
+                $span.html(message);
+            }
+        }).formValidation({
+            // excluded: [":disabled", ":hidden", ":not(:visible)"],
+            //live: "submitted",
+            framework: "bootstrap4",
+            icon: {
+                valid: "ss-check",
+                invalid: "ss-delete",
+                validating: "ss-refresh"
+            },
+            autoFocus: true,
+            fields: {
+                // firstName
+                firstName: {
+                    validMessage: "Nice to meet you!",
+                    validators: {
+                        notEmpty: {
+                            message: "Please enter your name."
+                        },
+                        stringLength: {
+                            min: 1,
+                            max: 30,
+                            message: "The name must be more than 1 and less than 50 characters long."
+                        },
+                        // regexp: {
+                        //     regexp: /^[a-zA-Z" \.]+$/,
+                        //     message: "The name can only consist of alphabetical"
+                        // }
+                    }
+                },
+                //Email Address
+                emailAddress: {
+                    validMessage: "Great! We will send you a confirmation e-mail with tracking # after purchasing.",
+                    validators: {
+                        notEmpty: {
+                            message: "The email address is required."
+                        },
+                        stringLength: {
+                            min: 1,
+                            max: 100,
+                            message: "The email address must be more than 6 and less than 30 characters long."
+                        },
+                        emailAddress: {
+                            message: "The email address is not valid."
+                        }
+                    }
+                },
+                // phoneNumber
+                phoneNumber: {
+                    validMessage: "Success! We will only call if there’s a problem shipping to your location.",
+                    validators: {
+                        notEmpty: {
+                            message: "Please supply a phone number so we can call if there are any problems shipping your flashlight."
+                        },
+                        stringLength: {
+                            min: 12, // real that is "10" but that include 2 symbols "-"
+                            message: "Not a valid 10-digit US phone number (must not include spaces or special characters)."
+                        }
+                    }
+                },
+                // address1
+                address1: {
+                    validMessage: "Success! Free shipping confirmed.",
+                    validators: {
+                        stringLength: {
+                            min: 1,
+                            max: 100,
+                            message: "The address must be less than 100 characters long."
+                        },
+                        notEmpty: {
+                            message: "The address is required."
+                        }
+                    }
+                },
+                // state
+                state: {
+                    validators: {
+                        notEmpty: {
+                            message: "The State is required."
+                        }
+                    }
+                },
+                // city
+                city: {
+                    validMessage: "That was easy!",
+                    validators: {
+                        stringLength: {
+                            max: 50,
+                            message: "The city must be less than 50 characters long."
+                        },
+                        notEmpty: {
+                            message: "The city is required."
+                        }
+                    }
+                },
+                // postalCode
+                postalCode: {
+                    validators: {
+                        stringLength: {
+                            min: 5,
+                            message: "The zip code must be 5 number long."
+                        },
+                        notEmpty: {
+                            message: "The zip code is required."
+                        }
+                    }
+                },
+                // cardNumber
+                cardNumber: {
+                    validMessage: "",
+                    validators: {
+                        creditCard: {
+                            message: "Enter a valid card number.",
+                            transformer: function($field, validatorName, validator) {
+                                // Get the number pr by user
+                                var value = $field.val();
+                                var CountOfChars = parseInt($field.val().length);
+                                if (CountOfChars === 17) {
+                                    value = value.substr(0, CountOfChars - 1);
+                                }
+
+                                // Check if it"s one of test card numbers
+                                if (value !== "" && $.inArray(value, TEST_CARD_NUMBERS) !== -1) {
+                                    // then turn it to be a valid one defined by VALID_CARD_NUMBER
+                                    return VALID_CARD_NUMBER;
+                                } else {
+                                    // Otherwise, just return the initial value
+                                    return value;
+                                }
+                            }
+                        },
+                        notEmpty: {
+                            message: "Enter the card number."
+                        },
+                        stringLength: {
+                            min: 15,
+                            message: "The credit card can be 15 or 16 digits."
+                        }
+                    }
+                },
+                // CSC
+                cardSecurityCode: {
+                    validators: {
+                        notEmpty: {
+                            message: "The Security Code is required."
+                        }
+                    }
+                },
+                // Month
+                month: {
+                    validators: {
+                        notEmpty: {
+                            message: "The Month is required."
+                        },
+                        callback: {
+                            message: "Please set month more or equal current.",
+                            callback: function(value, validator, $field) {
+                                var form = $field.parents("form");
+                                var currentDate = new Date();
+                                var year = parseInt(currentDate.getYear());
+                                var yearVal = parseInt(form.find("[name=year]").val());
+
+                                if (isNaN(yearVal) || yearVal === null || yearVal === undefined) {
+                                    return true;
+                                } else {
+                                    var selectedYear = 100 + (parseInt(form.find("[name=year]").val()) || 0);
+                                    var currentMonth = (parseInt(value) - 1 >= parseInt(currentDate.getMonth()));
+                                    if (selectedYear === year) {
+                                        if (currentMonth) {
+                                            form.find("[name=year]").parents(".form-group").removeClass("has-warning").addClass("has-success");
+                                            form.find("[name=year]").parents(".form-group").find(".fv-control-feedback").removeClass("fa-remove").addClass("fa-check");
+                                            form.find("[name=year]").parents(".form-group").find(".form-control-feedback").hide();
+                                        } else {
+                                            form.find("[name=year]").parents(".form-group").removeClass("has-success").addClass("has-warning");
+                                            form.find("[name=year]").parents(".form-group").find(".fv-control-feedback").removeClass("fa-check").addClass("fa-remove");
+                                            form.find("[name=year]").parents(".form-group").find("[data-fv-validator='callback']").show();
+                                        }
+                                        return currentMonth;
+                                    } else {
+                                        form.find("[name=year]").parents(".form-group").removeClass("has-warning").addClass("has-success");
+                                        form.find("[name=year]").parents(".form-group").find(".fv-control-feedback").removeClass("fa-remove").addClass("fa-check");
+                                        form.find("[name=year]").parents(".form-group").find(".form-control-feedback").hide();
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                // Year
+                year: {
+                    validators: {
+                        notEmpty: {
+                            message: "The Year is required."
+                        },
+                        callback: {
+                            message: "Please set year more or equal current.",
+                            callback: function(value, validator, $field) {
+                                var form = $field.parents("form");
+                                var currentDate = new Date();
+                                var yearCondition = 100 + parseInt(value) >= parseInt(currentDate.getYear());
+
+                                $("#checkoutForm").formValidation("revalidateField", "month");
+                                if ($("#checkoutForm").find("[name=month]").parents(".form-group").hasClass("has-warning")) {
+                                    return false;
+                                } else {
+                                    return yearCondition;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }).on("success.validator.fv", function(e, data) {
+            if (data.field === "cardNumber" && data.validator === "creditCard") {
+                var $icon = data.element.data("fv.icon");
+
+                $(".cc-logos ul>li img").removeClass("active");
+                $(".cc-logos ul>li img[data-value='" + data.result.type + "']").addClass("active");
+
+            }
+        }).on("err.field.fv", function(e, data) {
+            var field = data.field, // Get the field name
+                $field = data.element; // Get the field element
+
+            // Show the valid message element
+            $field.next(".validMessage[data-field='" + field + "']").hide();
+
+            var invalidFieldsCount = data.fv.getInvalidFields().length;
+            checkoutButtonPulse(CheckoutFieldsReq, invalidFieldsCount);
+        }).on("status.field.fv", function(e, data) {
+            data.fv.disableSubmitButtons(false);
+        }).on("success.field.fv", function(e, data) {
+            var field = data.field, // Get the field name
+                $field = data.element; // Get the field element
+
+            if (data.fv.getSubmitButton()) {
+                data.fv.disableSubmitButtons(false);
+            }
+            // Show the valid message element
+            $field.next(".validMessage[data-field='" + field + "']").show();
+
+            var invalidFieldsCount = data.fv.getInvalidFields().length;
+            checkoutButtonPulse(CheckoutFieldsReq, invalidFieldsCount);
+        }).on("err.form.fv", function(e) {}).on("success.form.fv", function(e) {
+            submitOrderForm("#checkoutForm");
+            e.preventDefault();
+        });
+
+        // Credit Card Behavior BEGIN
+        $("input#creditcard").detectCard({
+            supported: ["american-express", "visa", "mastercard", "discover"]
+        });
+        $("input#creditcard").on("keyup", function() {
+            if ($(this).val() === "" || $(this).val() === undefined) {
+                $(this).parents(".form-group").prev(".payment-icon").find(".cc-icon").removeClass("inactive active");
+            }
+        }).on("cardChange", function(e, card) {
+            if (card.supported) {
+                $(".payment-icon .cc-icon.cc-" + card.type).parents("a").siblings().find(".cc-icon").removeClass("active").addClass("inactive");
+                $(".payment-icon .cc-icon.cc-" + card.type).removeClass("inactive").addClass("active");
+            } else {
+                $(".payment-icon .cc-icon").removeClass("inactive active");
+            }
+        });
+        // END Credit Card Behavior
+
+        $("#checkoutForm").submit(function(e) {
+            // submitOrderForm("#checkoutForm");
+            e.preventDefault();
+        });
+
+        //  Apply mask for checkout fields
+        $("input[name=cardNumber]").mask("0000000000000000", {
+            "translation": {
+                0: {
+                    pattern: /[0-9]/
+                }
+            }
+        });
+        $("input[name=postalCode]").mask("00000", {
+            "translation": {
+                0: {
+                    pattern: /[0-9]/
+                }
+            }
+        });
+
+        var checkoutFields = [
+            "firstName",
+            "lastName",
+            "emailAddress",
+            "phoneNumber",
+            "address1",
+            "city",
+            "state",
+            "postalCode",
+            "cardNumber",
+            "month",
+            "year"
+        ];
+
+        // Load cached values
+        $.each(checkoutFields, function(index, value) {
+            if ($("[name=" + value + "]").length === 0) {
+                return;
+            }
+            var uVal = MediaStorage[value];
+            if (uVal && uVal !== null && uVal !== "null") {
+                $("[name=" + value + "]").val(uVal);
+                $("[name=" + value + "]").data("previousValue", uVal);
+                $("#checkoutForm").formValidation("revalidateField", value);
+            }
+        });
+
+        // Save Checkout Page details to DB engine
+        var saveToMediaStorage = function() {
+            $.each(checkoutFields, function(index, value) {
+                if (value !== "cardNumber" && value !== "year" && value !== "month") {
+                    if ($("[name=" + value + "]").length > 0) {
+                        var uVal = $("[name=" + value + "]").val();
+                        localStorage.setItem(value, uVal);
+                    }
+                }
+            });
+        };
+
+        $("form").on("change", saveToMediaStorage);
+        window.onbeforeunload = saveToMediaStorage;
+    }
+}());
+
+/* jshint browser: true */
+/* jshint node: false */
+/* jshint maxlen: 200 */
+function numfield_keydown(e) {
+    "use strict";
+
+	e = (e) ? e : window.event;
+	var charCode = (e.which) ? e.which : e.keyCode;
+	var availableChar = [8, 18, 33, 34, 35, 36, 37, 38, 39, 40, 46, 190];
+
+	if ((e.ctrlKey && (e.keyCode === 86 || e.keyCode === 67)) || (e.shiftKey && availableChar.indexOf(charCode) !== -1)) {
+		return true;
+	}
+	if (availableChar.indexOf(charCode) !== -1) {
+		return true;
+	}
+	if (charCode >= 96 && charCode <= 105 ) {
+		return true;
+	}
+	if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+		return false;
+	}
+
+	return true;
+}
+
+function name_keydown(e) {
+    "use strict";
+
+	e = (e) ? e : window.event;
+	var charCode = (e.which) ? e.which : e.keyCode;
+	var availableChar = [8, 9, 18, 32, 33, 34, 35, 36, 37, 38, 39, 40, 46, 190];
+
+	if ((e.ctrlKey && (e.keyCode === 86 || e.keyCode === 67)) || (e.shiftKey && availableChar.indexOf(charCode) !== -1)) {
+		return true;
+	}
+	if (availableChar.indexOf(charCode) !== -1) {
+		return true;
+	}
+	// Uppercase
+	if (charCode >= 65 && charCode <= 90) {
+		return true;
+	}
+	// Lowercase
+	if (charCode >= 97 && charCode <= 122) {
+		return true;
+	}
+	// Number
+	if (charCode >= 48 && charCode <= 57) {
+		return true;
+	}
+
+	return false;
+}
+
+function validate() {
+    "use strict";
+    
+    if ($("input.numfield").length > 0)
+    {
+        $("input.numfield").on("keydown", numfield_keydown);
+    }
+
+    if ($("input#name").length > 0) {
+        $("input#name").on("keydown", name_keydown);
+    }
+
+    if ($("input[type=tel]").length > 0)
+    {
+        $("input[type=tel]").on("keydown", function (e) {
+            e = (e) ? e : window.event;
+            var charCode = (e.which) ? e.which : e.keyCode;
+            
+            if (charCode === 189)  {
+                return false;
+            }
+            return true;
+        });
+    }
+
+    /* global isMobileSafari:true */
+    // Look for ios devices and safari
+    if (isMobileSafari()) {
+        // Search for credit card input and change it to text field
+        if ($("input#creditcard").length > 0)
+        {
+            $("input#creditcard").attr("type", "text");
+        }
+    }
+
+    /* global customWrapperForIsMobileDevice:true */
+    if (!customWrapperForIsMobileDevice()) {
+        $("input[type=number]").attr("type", "text");
+    }
+        
+    // Image lazyload
+    /* jshint ignore:start */
+    $("img.lazy").lazyload({
+        skip_invisible : true
+    });
+    /* jshint ignore:end */
+
+    // X symbol for input fields
+    if ($(".clearable").length > 0) {
+        $(".clearable").addClear({
+            closeSymbol: "&#10006;",
+            color: "#CCC",
+            top: "35px",
+            right: "38px",
+            returnFocus: true,
+            showOnLoad: true,
+            onClear: function($input) {
+                var formValidation = $input.closest("form").data("formValidation");
+
+                if (formValidation) {
+                    formValidation.revalidateField($input.attr("name"));
+                }
+            },
+            paddingRight: "55px",
+            lineHeight: "1",
+            display: "block"
+        });
+    }
+
+    // Mailcheck Plugin Code here
+    if ($("#email").length > 0) {
+        var domains = ["hotmail.com", "gmail.com", "aol.com"];
+
+        $("#email").on("blur", function() {
+            $(this).mailcheck({
+                domains: domains,
+                suggested: function(element, suggestion) {
+                    $("#email + small").show();
+                    $("#email + small").html("Did you mean <a href='javascript:void(0)''>" + suggestion.full + "</a>");
+                },
+                empty: function(element) {
+                    //jshint unused:false
+                }
+            });
+        });
+
+        // If user click on the suggested email, it will replace that email with suggested one.
+        $("body").on("click", "#email + small a", function() {
+            $("#email").val($(this).html());
+            $("#email + small").hide();
+            $("#email + small").html("Great! We will send you a confirmation e-mail with tracking # after purchasing.");
+
+            if ($("form").length > 0) {
+                $("form").formValidation("revalidateField", "email");
+            }
+        });
+    }
+}
+
+validate();
+/* jshint browser: true */
+/* jshint node: false */
+/* jshint maxlen: 1000 */
+
+function init_field_fv(e, data) {
+	"use strict";
+
+	var field = data.field,        // Get the field name
+		$field = data.element,      // Get the field element
+		bv = data.fv;           // FormValidation instance
+
+	// Create a span element to show valid message
+	// and place it right before the field
+	var $span = $("<small/>")
+		.addClass("help-block validMessage text-success")
+		.attr("data-field", field)
+		.insertAfter($field)
+		.hide();
+
+	// Retrieve the valid message via getOptions()
+	var message = bv.getOptions(field).validMessage;
+	if (message) {
+		$span.html(message);
+	}
+}
+
+function success_field_fv(e, data) {
+	"use strict";
+
+	var field = data.field, // Get the field name
+		$field = data.element; // Get the field element
+
+	// Show the valid message element
+	$field.next(".validMessage[data-field='" + field + "']").show();
+}
+
+function err_field_fv(e, data) {
+	"use strict";
+
+	var field = data.field, // Get the field name
+		$field = data.element; // Get the field element
+
+	// Show the valid message element
+	$field.next(".validMessage[data-field='" + field + "']").hide();
+}
+
+(function() {
+	"use strict";
+	/* global phoneNumberOptions:true, customWrapperForIsMobileDevice:true */
+	/* global callAPI:true, bootstrapModal:true, GlobalConfig:true */
+	$("input[name=phoneNumber]").mask("000-000-0000", phoneNumberOptions);
+    var MediaStorage = {};
+
+    // Lead create/update
+    function createLead(data, callback) {
+        /* global callAPI:true, isValidJson:true */
+        var crmLead = {};
+
+        crmLead.firstName = data.FirstName;
+        crmLead.lastName = data.LastName;
+        crmLead.phoneNumber = data.MobilePhone;
+        crmLead.emailAddress = data.Email;
+
+        MediaStorage.firstName = data.FirstName;
+        MediaStorage.lastName = data.LastName;
+        MediaStorage.phoneNumber = data.MobilePhone;
+        MediaStorage.emailAddress = data.Email;
+
+        callAPI("create-lead", crmLead, "POST", function (resp) {
+
+            if(resp.success){
+                if (resp.orderId) {
+                    MediaStorage.orderId = resp.orderId;
+					localStorage.setItem('orderId', resp.orderId);
+                }
+            }
+
+        });
+    }
+
+    function updateLead(data, cb) {
+        /* global callAPI:true */
+        var crmLead = data;
+        crmLead.orderId = MediaStorage.orderId;
+        crmLead.firstName = MediaStorage.firstName;
+        crmLead.lastName = MediaStorage.lastName;
+        crmLead.phoneNumber = MediaStorage.phoneNumber;
+        crmLead.emailAddress = MediaStorage.emailAddress;
+
+        callAPI("create-lead", crmLead, "POST", function (e) {
+            console.log(e);
+            cb();
+        });
+    }
+
+    // Forms submit
+	var submittedContactForm = false; // This switches between contact modal & address modal
+
+    function submitContactForm() {
+	    var data = {};
+	    data.Email = $("[name=email]").val();
+	    data.FirstName = $("[name=contactModalName]").val();
+	    data.MobilePhone = $("[name=phoneNumber]").val();
+        data.LastName = "NA";
+
+        localStorage.setItem('firstName', data.FirstName);
+        localStorage.setItem('lastName', data.LastName);
+        localStorage.setItem('emailAddress', data.Email);
+        localStorage.setItem('phoneNumber', data.MobilePhone);
+
+        console.log("sbmtCntFrm---------->");
+
+	    $("div#js-div-loading-bar").show();
+	    callAPI("add-contact", data, "POST", function(response) {
+	        //var json = {};
+
+            if(response.success){
+                createLead(data );                    
+                // submittedContactForm = true;
+                // In case of Mobile devices, show address modal and go to checkout page.
+                if (customWrapperForIsMobileDevice()) {
+                    $("div#js-div-loading-bar").hide();
+                    $("#modal-contact .close-modal").click();
+                    $(".btn-address-modal").click();
+                } else {
+                    window.location = "checkout.html";
+                }
+                
+            }else{
+                $("div#js-div-loading-bar").hide();
+            }
+
+	    });
+	}
+
+    // submit address form
+    function submitAddressForm() {
+        var addressFormFields = ["address1", "city", "state", "postalCode"];
+        var tmp = {};
+
+        $.each(addressFormFields, function(index, value) {
+            if ($("[name=" + value + "]").length > 0) {
+                var uVal = $("[name=" + value + "]").val();
+                localStorage.setItem(value, uVal);
+                tmp[value] = uVal;
+            }
+        });
+
+        updateLead(tmp, function() {
+            //window.location = GlobalConfig.BasePagePath + "checkout.html";
+            window.location = "checkout.html";
+        });
+    }
+
+	/*
+     * Contact Form Validator
+     */
+	if ($("#form-contact").length > 0) {
+		$("#form-contact")
+        .on("init.field.fv", init_field_fv)
+        .formValidation({
+            framework: "bootstrap4",
+            icon: {
+                valid: "ss-check",
+                invalid: "ss-delete",
+                validating: "ss-refresh"
+            },
+            autoFocus: true,
+            fields: {
+                // Name field
+                contactModalName: {
+                    validMessage: "Nice to meet you!",
+                    validators: {
+                        notEmpty: {
+                            message: "Please enter your name."
+                        },
+                        stringLength: {
+                            max: 100,
+                            message: "The name must be more than 1 and less than 50 characters long."
+                        }
+                    }
+                },
+                // Email field
+                email: {
+                    validMessage: "Great! We will send you a confirmation e-mail with tracking # after purchasing.",
+                    validators: {
+                        notEmpty: {
+                            message: "The email address is required."
+                        },
+                        stringLength: {
+                            min: 1,
+                            max: 100,
+                            message: "The email address must be more than 6 and less than 30 characters long."
+                        },
+                        emailAddress: {
+                            message: "The email address is not valid."
+                        }
+                    }
+                },
+                // phone number field
+                phoneNumber: {
+                    validMessage: "Success! We will only call if there’s a problem shipping to your location.",
+                    validators: {
+                        notEmpty: {
+                            message: "Please supply a phone number so we can call if there are any problems shipping your flashlight."
+                        },
+                        stringLength: {
+                            min: 12, // real that is "10" but that include 2 symbols "-"
+                            message: "Not a valid 10-digit US phone number (must not include spaces or special characters)."
+                        }
+                    }
+                }
+            }
+        })
+        .on("err.field.fv", function(e, data) {})
+        .on("success.validator.fv", function(e, data) {})
+        .on("err.form.fv", function(e, data) {})
+        .on("success.form.fv", function(e, data) {
+            submitContactForm();
+            e.preventDefault();
+        })
+        .on("success.field.fv", success_field_fv)
+        .on("err.field.fv", err_field_fv);
+
+        $("#form-contact").submit(function(e) {
+            // submitContactForm();
+            e.preventDefault();
+        });
+	}
+
+    // Address Form Validator
+    if ($("#form-address").length > 0) {
+        $("#form-address")
+        .on("init.field.fv", init_field_fv)
+        .formValidation({
+            // excluded: [":disabled", ":hidden", ":not(:visible)"],
+            framework: "bootstrap4",
+            icon: {
+                valid: "ss-check",
+                invalid: "ss-delete",
+                validating: "ss-refresh"
+            },
+            autoFocus: true,
+            fields: {
+                // address1
+                address1: {
+                    validMessage: "Success! Free shipping confirmed.",
+                    validators: {
+                        stringLength: {
+                            min: 1,
+                            max: 100,
+                            message: "The address must be less than 100 characters long."
+                        },
+                        notEmpty: {
+                            message: "The address is required."
+                        }
+                    }
+                },
+                // state
+                state: {
+                    validators: {
+                        notEmpty: {
+                            message: "The State is required."
+                        }
+                    }
+                },
+                // city
+                city: {
+                    validMessage: "That was easy!",
+                    validators: {
+                        stringLength: {
+                            max: 50,
+                            message: "The city must be less than 50 characters long."
+                        },
+                        notEmpty: {
+                            message: "The city is required."
+                        }
+                    }
+                },
+                // postalCode
+                postalCode: {
+                    validators: {
+                        stringLength: {
+                            min: 5,
+                            message: "The zip code must be 5 number long."
+                        },
+                        notEmpty: {
+                            message: "The zip code is required."
+                        },
+                    }
+                },
+            }
+        })
+        .on("err.field.fv", function(e, data) {})
+        .on("success.validator.fv", function(e, data) {})
+        .on("err.form.fv", function(e, data) {})
+        .on("success.form.fv", function(e, data) {
+            submitAddressForm();
+            e.preventDefault();
+        })
+        .on("success.field.fv", success_field_fv)
+        .on("err.field.fv", err_field_fv);
+
+        $("#form-address").submit(function(e) {
+            e.preventDefault();
+        });
+        $("input[name=postalCode]").mask("00000", {"translation": {0: {pattern: /[0-9]/}}});
+    }
+
+    $(".footer-image").click(function() {
+        $(".btn-buy-modal").click();
+    });
+
+    // Hash detect BEGINS
+    /*window.onhashchange = function() {
+        if (window.location.hash === "#showcontactmodal") {
+            $(".btn-buy-modal").click();
+            window.location.hash = "";
+        }
+    };
+    window.onhashchange();
+    // Hash detect ENDS
+		*/
+    if ($("#modal-contact").length > 0) {
+        $("#modal-contact").on("shown.bs.modal", function(event) {
+            // window.scrollTo(0, 1);
+
+            // // For showing keyboard on mobile device
+            // setTimeout(function(){
+            //     $("#name").focus();
+            // }, 1000);
+        });
+    }
+
+    // Once submitted contact form and click on the green button again show address modal
+    $(".btn-buy-modal").click(function(e) {
+        if (submittedContactForm) {
+            $(".btn-address-modal").click();
+            e.stopPropagation();
+        }
+    });
+}());
+
+/* jshint browser: true, node: false */
+/* global getStorageItem:true, afGet:true, callAPI:true, GlobalConfig:true, SanitizedLocName:true, isValidJson:true */
+
+(function() {
+	"use strict";
+
+	var pageType = null;
+	if (SanitizedLocName.indexOf("receipt") >= 0)
+	{
+		pageType = "receipt";
+	} else if (SanitizedLocName.indexOf("us_batteryoffer") >= 0 || SanitizedLocName.indexOf("us_headlampoffer") >= 0) {
+		pageType = "upsell";
+	}
+
+	if (pageType === null) {
+		// Not "upsell" or "receipt" page
+		return;
+	}
+
+	var myOrderID = getStorageItem("orderId");
+	if (typeof myOrderID === "undefined") {
+		//window.location = GlobalConfig.BasePagePath + "index.html";
+		window.location = "index.html";
+	}
+	if (myOrderID === null) {
+		// window.location = GlobalConfig.BasePagePath + "checkout.html";
+		window.location = "checkout.html";
+		return;
+	}
+
+	function populateThanksPage(orderInfos) {
+		if ($.type(orderInfos) === "array") {
+		    orderInfos = orderInfos[0];
+		}
+
+		$("#orderNumber").html(orderInfos.orderId);
+		callAPI("get-trans", orderInfos.orderId, "GET", function (resp) {
+		    if (resp.success) {
+		        if (resp.data) {
+		            var firstRow = resp.data[0];
+		            if (firstRow && firstRow.merchant) {
+		                $("#ccIdentity").html("<br>" + firstRow.merchant);
+		            } else {
+		                $("#ccIdentity").html("<br>Tactical Mastery");
+		            }
+		        }
+		    }
+
+		});
+	}
+
+	callAPI("get-lead", myOrderID, "GET", function (resp) {
+        if (pageType === "receipt") {
+            if (resp.success) {
+                populateThanksPage(resp.data);
+            } else if (resp.message) {
+                console.log("Error: " + resp.message);
+                // window.location = GlobalConfig.BasePagePath + "index.html";
+				window.location = "index.html";
+            }
+        } else {
+            if (resp.message && resp.message.data && resp.message.data[0]) {
+                if (resp.message.data[0].orderStatus === "COMPLETE") {
+                    // the order is complete and they are not on the success page
+                    // they can be on an upsell page up to an hour after the initial sale
+                    var doThatPop = true;
+                    if (pageType === "upsell") {
+                        var gmtStr = resp.message.data[0].dateUpdated + " GMT-0400";
+                        var orderDate = new Date(gmtStr);
+                        var nowDate = new Date();
+                        var minutesSince = ((nowDate - orderDate) / 1000 / 60);
+                        doThatPop = (minutesSince > 55);
+                    }
+
+                    if (doThatPop) {
+						// window.location = GlobalConfig.BasePagePath + "receipt.html";
+						window.location = "receipt.html";
+                    }
+                }
+            }
+        }
+    });
+}());
+
+/* jshint browser: true, node: false */
+/* global loadStateFromZip:true */
+
+(function() {
+    "use strict";
+
+    var tmpZipCode = "";
+    function validateFields(frm, fields) {
+        if (frm.length > 0) {
+            $.each(fields, function(index, key) {
+                if ($("input[name=" + key + "]").length > 0 && $("input[name=" + key + "]").val() !== "") {
+                    switch (key) {
+                        case "postalCode":
+                            if ($("input[name=" + key + "]").val() !== tmpZipCode) {
+                                tmpZipCode = $("input[name=" + key + "]").val();
+                                loadStateFromZip();
+                            }
+                            break;
+                        case "phoneNumber":
+                            var phoneNumber = $("input[name=phoneNumber]").val();
+                            if (phoneNumber.length === 10 && phoneNumber.indexOf("-") < 0) {
+                                phoneNumber = phoneNumber.substr(0, 3) + "-" + phoneNumber.substr(3, 3) + "-" + phoneNumber.substr(6);
+                                $("input[name=phoneNumber]").val(phoneNumber);
+                                frm.formValidation("revalidateField", "phoneNumber");
+                            }
+                            break;
+                        default:
+                            frm.formValidation("revalidateField", key);
+                    }
+                }
+            });
+        }
+    }
+
+    function autoFillCheck() {
+        validateFields($("#form-contact"), ["name", "email", "phoneNumber"]);
+        validateFields($("#form-address"), ["address1", "postalCode", "city"]);
+        validateFields($("#checkoutForm"), ["firstName", "emailAddress", "phoneNumber", "address1", "postalCode", "city", "cardNumber"]);
+
+        setTimeout(function() { autoFillCheck(); }, 300);
+    }
+    setTimeout(function() { autoFillCheck(); }, 300);
+}());
