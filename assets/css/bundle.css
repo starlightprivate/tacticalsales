@@ -2613,6 +2613,11 @@ a.tag:focus,a.tag:hover {
   }
 }
 
+base::-moz-progress-bar {
+  background-color: #eee;
+  border-radius: .25rem;
+}
+
 .media,.media-body {
   overflow: hidden;
 }
@@ -7820,120 +7825,6 @@ html:hover [class^="ss-"] {
 .pg-tm3 .footer p {
   color: #bdbdbd;
   margin: 0;
-}
-
-/* line 1, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-/* line 5, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-/* line 10, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-/* line 14, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-/* line 18, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-/* line 25, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-/* line 29, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-/* line 34, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-/* line 44, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-/* line 49, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-/* line 54, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-/* line 62, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-/* line 67, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-/* line 79, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-@media (max-width: 800px) {
-  /* line 89, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 92, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 96, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 100, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 105, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-}
-
-@media (max-width: 710px) {
-  /* line 112, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 115, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 119, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 123, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-}
-
-@media (max-width: 542px) {
-  /* line 131, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 135, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 140, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 144, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 149, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 154, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 158, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 162, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 167, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-}
-
-@media (max-width: 480px) {
-  /* line 175, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 179, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 183, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 189, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 193, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 197, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-}
-
-@media (max-width: 380px) {
-  /* line 203, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 208, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 212, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-}
-
-@media (max-width: 340px) {
-  /* line 220, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 223, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 227, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 233, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 237, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 241, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-}
-
-@media (max-width: 320px) {
-  /* line 247, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 253, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
-
-  /* line 257, /home/destro/Destro/Tm/new2/Tactical-Mastery-Funnel/src/styles/_callnow.scss */
 }
 
 /*!
